@@ -1,8 +1,7 @@
 package frc.robot.subsystems.vision;
 
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -11,6 +10,7 @@ import java.util.Optional;
 import org.littletonrobotics.junction.Logger;
 
 public class Vision extends SubsystemBase {
+  private static final String HAS_TARGET_KEY = "EagleEye/HasTarget";
   private final NetworkTable visionTable;
 
   public Vision() {
@@ -19,62 +19,59 @@ public class Vision extends SubsystemBase {
 
   @Override
   public void periodic() {
-    Optional<Pose3d> targetPose = getTargetPose();
-    targetPose.ifPresent(pose -> Logger.recordOutput("EagleEye/TargetPose", pose));
+    Optional<Pose2d> targetPose = getTargetPose();
+    targetPose.ifPresent(
+        pose ->
+            Logger.recordOutput(
+                "EagleEye/TargetPose",
+                pose.rotateAround(pose.getTranslation(), new Rotation2d(Math.PI / 2))));
   }
 
   /**
-   * Gets the target position from NetworkTables and converts it to a Pose3d.
+   * Gets the target pose from NetworkTables and converts it to a Pose2d.
    *
-   * @return Optional containing the target Pose3d if data is available, empty otherwise
+   * @return Optional containing the target Pose2d if data is available, empty otherwise
    */
-  public Optional<Pose3d> getTargetPose() {
+  public Optional<Pose2d> getTargetPose() {
     var positionEntry = visionTable.getEntry(VisionConstants.kTargetPositionEntryName);
     byte[] rawPacket = positionEntry.getRaw(new byte[0]);
 
     if (rawPacket.length == 0) {
-      Logger.recordOutput("EagleEye/HasTarget", false);
+      Logger.recordOutput(HAS_TARGET_KEY, false);
       return Optional.empty();
     }
 
     try {
       Object decodedPayload = FlatpackDecoder.decode(rawPacket);
       Logger.recordOutput("EagleEye/FlatpackSchema", determineSchemaLabel(decodedPayload));
-      Optional<Translation3d> translation = extractTranslation(decodedPayload);
+      Optional<Pose2d> pose = extractPose(decodedPayload);
 
-      if (translation.isPresent()) {
-        Pose3d targetPose = new Pose3d(translation.get(), new Rotation3d());
-        Logger.recordOutput("EagleEye/HasTarget", true);
-        Logger.recordOutput("EagleEye/TargetPosition", translation.get());
+      if (pose.isPresent()) {
+        Pose2d targetPose = pose.get();
+        Logger.recordOutput(HAS_TARGET_KEY, true);
         return Optional.of(targetPose);
       }
 
-      Logger.recordOutput("EagleEye/HasTarget", false);
+      Logger.recordOutput(HAS_TARGET_KEY, false);
       Logger.recordOutput("EagleEye/FlatpackError", "Unsupported payload structure");
       return Optional.empty();
     } catch (IllegalArgumentException exception) {
-      Logger.recordOutput("EagleEye/HasTarget", false);
+      Logger.recordOutput(HAS_TARGET_KEY, false);
       Logger.recordOutput("EagleEye/FlatpackError", exception.getMessage());
       return Optional.empty();
     }
   }
 
-  private Optional<Translation3d> extractTranslation(Object decodedPayload) {
-    if (decodedPayload instanceof FlatpackDecoder.Vector3[] vectors && vectors.length > 0) {
-      FlatpackDecoder.Vector3 vector = vectors[0];
-      return Optional.of(new Translation3d(vector.x, vector.y, vector.z));
+  private Optional<Pose2d> extractPose(Object decodedPayload) {
+    Optional<Pose2d> pose = poseFromConcretePayload(decodedPayload);
+    if (pose.isPresent()) {
+      return pose;
     }
-
-    if (decodedPayload instanceof FlatpackDecoder.Vector2[] vectors && vectors.length > 0) {
-      FlatpackDecoder.Vector2 vector = vectors[0];
-      return Optional.of(new Translation3d(vector.x, vector.y, 0.0));
+    pose = poseFromGenericPayload(decodedPayload);
+    if (pose.isPresent()) {
+      return pose;
     }
-
-    if (decodedPayload instanceof float[] values && values.length >= 3) {
-      return Optional.of(new Translation3d(values[0], values[1], values[2]));
-    }
-
-    return Optional.empty();
+    return poseFromFloatArray(decodedPayload);
   }
 
   private String determineSchemaLabel(Object decodedPayload) {
@@ -86,10 +83,113 @@ public class Vision extends SubsystemBase {
       return "vector2_array";
     }
 
+    if (decodedPayload instanceof FlatpackDecoder.Pose3D[]) {
+      return "pose3d_array";
+    }
+
+    if (decodedPayload instanceof FlatpackDecoder.Pose2D[]) {
+      return "pose2d_array";
+    }
+
     if (decodedPayload instanceof float[]) {
       return "float_array";
     }
 
+    if (decodedPayload instanceof FlatpackDecoder.GenericObjectArray genericArray) {
+      return genericArray.descriptor.name + "_array";
+    }
+
+    if (decodedPayload instanceof FlatpackDecoder.GenericObject genericObject) {
+      return genericObject.descriptor.name;
+    }
+
     return decodedPayload.getClass().getSimpleName();
+  }
+
+  private Optional<Pose2d> poseFromDescriptor(
+      FlatpackDecoder.SchemaDescriptor descriptor, float[] values) {
+    Double xComponent = null;
+    Double yComponent = null;
+    Double rotationComponent = null;
+    for (int index = 0; index < Math.min(descriptor.components.size(), values.length); index++) {
+      String componentName = descriptor.components.get(index);
+      double componentValue = values[index];
+      if (componentName.equalsIgnoreCase("x")) {
+        xComponent = componentValue;
+      } else if (componentName.equalsIgnoreCase("y")) {
+        yComponent = componentValue;
+      } else if (componentName.equalsIgnoreCase("rotation")
+          || componentName.equalsIgnoreCase("theta")
+          || componentName.equalsIgnoreCase("yaw")) {
+        rotationComponent = componentValue;
+      }
+    }
+    if (xComponent == null || yComponent == null) {
+      return Optional.empty();
+    }
+    double heading = rotationComponent == null ? 0.0 : rotationComponent;
+    return Optional.of(new Pose2d(xComponent, yComponent, new Rotation2d(heading)));
+  }
+
+  private Optional<Pose2d> poseFromConcretePayload(Object payload) {
+    if (payload instanceof FlatpackDecoder.Pose3D[] poses3d && poses3d.length > 0) {
+      return Optional.of(poseFromPose3d(poses3d[0]));
+    }
+    if (payload instanceof FlatpackDecoder.Pose2D[] poses2d && poses2d.length > 0) {
+      return Optional.of(poseFromPose2d(poses2d[0]));
+    }
+    if (payload instanceof FlatpackDecoder.Pose3D pose3d) {
+      return Optional.of(poseFromPose3d(pose3d));
+    }
+    if (payload instanceof FlatpackDecoder.Pose2D pose2d) {
+      return Optional.of(poseFromPose2d(pose2d));
+    }
+    if (payload instanceof FlatpackDecoder.Vector3[] vectors3 && vectors3.length > 0) {
+      return Optional.of(poseFromVector(vectors3[0]));
+    }
+    if (payload instanceof FlatpackDecoder.Vector2[] vectors2 && vectors2.length > 0) {
+      return Optional.of(poseFromVector(vectors2[0]));
+    }
+    if (payload instanceof FlatpackDecoder.Vector3 vector3) {
+      return Optional.of(poseFromVector(vector3));
+    }
+    if (payload instanceof FlatpackDecoder.Vector2 vector2) {
+      return Optional.of(poseFromVector(vector2));
+    }
+    return Optional.empty();
+  }
+
+  private Pose2d poseFromVector(FlatpackDecoder.Vector3 vector) {
+    return new Pose2d(vector.x, vector.y, new Rotation2d());
+  }
+
+  private Pose2d poseFromVector(FlatpackDecoder.Vector2 vector) {
+    return new Pose2d(vector.x, vector.y, new Rotation2d());
+  }
+
+  private Pose2d poseFromPose3d(FlatpackDecoder.Pose3D pose) {
+    return new Pose2d(pose.x, pose.y, new Rotation2d(pose.yaw));
+  }
+
+  private Pose2d poseFromPose2d(FlatpackDecoder.Pose2D pose) {
+    return new Pose2d(pose.x, pose.y, new Rotation2d(pose.rotation));
+  }
+
+  private Optional<Pose2d> poseFromGenericPayload(Object payload) {
+    if (payload instanceof FlatpackDecoder.GenericObjectArray array && array.values.length > 0) {
+      return poseFromDescriptor(array.descriptor, array.values[0]);
+    }
+    if (payload instanceof FlatpackDecoder.GenericObject object) {
+      return poseFromDescriptor(object.descriptor, object.values);
+    }
+    return Optional.empty();
+  }
+
+  private Optional<Pose2d> poseFromFloatArray(Object payload) {
+    if (payload instanceof float[] values && values.length >= 2) {
+      double heading = values.length >= 3 ? values[2] : 0.0;
+      return Optional.of(new Pose2d(values[0], values[1], new Rotation2d(heading)));
+    }
+    return Optional.empty();
   }
 }

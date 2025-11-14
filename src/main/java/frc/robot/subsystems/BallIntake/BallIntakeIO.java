@@ -1,6 +1,6 @@
 package frc.robot.subsystems.BallIntake; // Packages are consisten with the folder name
 
-import org.littletonrobotics.junction.AutoLog.ba;
+import org.littletonrobotics.junction.AutoLog;
 
 public interface BallIntakeIO // Classes and methods are all capitalized
 {

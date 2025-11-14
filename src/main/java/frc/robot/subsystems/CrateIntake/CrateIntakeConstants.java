@@ -8,7 +8,16 @@ public class CrateIntakeConstants {
     public enum CrateIntakeState {
         INTAKE(1.0),
         OUTTAKE(-1.0),
-        STOP(0.0)
+        STOP(0.0);
 
+    
+    
+
+        public final double motorSpeed;
+
+        CrateIntakeState(double motorSpeed) {
+            this.motorSpeed = motorSpeed;
+        }
     }
 }
+    

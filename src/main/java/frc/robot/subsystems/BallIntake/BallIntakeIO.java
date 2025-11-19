@@ -10,12 +10,6 @@ public interface BallIntakeIO // Classes and methods are all capitalized
         public double motorSpeed = 0.0;
     }
 
-    public default void updateInputs(BallIntakeIOInputs inputs)
-    {
-        // nothing
-    }
-    public default void setMotorspeed(double speed)
-    {
-        // nothing
-    }
+    public default void updateInputs(BallIntakeIOInputs inputs) {}
+    public default void setMotorspeed(double speed) {}
 }

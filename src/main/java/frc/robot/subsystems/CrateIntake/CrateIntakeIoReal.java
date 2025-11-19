@@ -9,11 +9,11 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 
-public class CrateIntakeIoReal implements CrateIntakeIO {
+public class CrateIntakeIOReal implements CrateIntakeIO {
   private final SparkMax leftMotor;
   private final SparkMax rightMotor;
 
-  public CrateIntakeIoReal() {
+  public CrateIntakeIOReal() {
     leftMotor = new SparkMax(CrateIntakeConstants.leftIntakeCanId, MotorType.kBrushless);
     rightMotor = new SparkMax(CrateIntakeConstants.rightIntakeCanId, MotorType.kBrushless);
 

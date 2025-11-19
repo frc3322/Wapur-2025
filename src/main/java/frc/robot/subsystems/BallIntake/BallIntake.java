@@ -9,14 +9,15 @@ import frc.robot.subsystems.BallIntake.BallIntakeConstants.BallIntakeState;
 
 public class BallIntake extends SubsystemBase {
 
-    private static final BallIntakeIO ballIntakeIO;
+    private final BallIntakeIO ballIntakeIO;
     private static BallIntake instance;
-    
-    
+
+    private final BallIntakeIOInputsAutologged inputs = new BallIntakeIOInputsAutologged();
+
     
     public static BallIntake getInstance() {
         if (instance == null) {
-                instance = new BallIntake (new BallIntakeIOReal());
+                instance = new BallIntake(new BallIntakeIOReal());
             }
         return instance;
     }
@@ -26,20 +27,19 @@ public class BallIntake extends SubsystemBase {
     }
 
     public void updateInputs() {
-        ballIntakeIO.updateInputs(inputs);
-        Logger.processInputs(key: "BallIntake", inputs);
+        BallIntakeIO.updateInputs(inputs);
+        Logger.processInputs("BallIntake", inputs);
 
     }
     
     @Override
-
     public void periodic() {
         updateInputs();
     }
 
 
     public void setState(BallIntakeState State) {
-        BallIntakeIO.setMotorspeed(State.Motorspeed); 
+        ballIntakeIO.setMotorspeed(State.motorSpeed); 
     }
 
     public void setMotorspeed(double speed) {

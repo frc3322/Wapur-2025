@@ -9,7 +9,6 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import edu.wpi.first.wpilibj.Encoder;
 import frc.robot.subsystems.elevator.ElevatorConstants.ControllerConstants;
 import frc.robot.subsystems.elevator.ElevatorConstants.ElevatorCANIds;
 
@@ -17,7 +16,6 @@ import static frc.robot.util.SparkUtil.tryUntilOk;
 
 public class ElevatorIOReal implements ElevatorIO{
     private SparkFlex leftMotor;
-    private SparkFlex rightMotor;
 
     RelativeEncoder LeftEncoder;
 
@@ -30,12 +28,9 @@ public class ElevatorIOReal implements ElevatorIO{
     public ElevatorIOReal() {
         // Initializeing the motors
         leftMotor = new SparkFlex(ElevatorCANIds.leftMotorCANId, MotorType.kBrushless);
-        rightMotor = new SparkFlex(ElevatorCANIds.rightMotorCANId, MotorType.kBrushless);
 
         // The setting objects for both motors
         SparkMaxConfig leftConfig = new SparkMaxConfig();
-        SparkMaxConfig rightConfig = new SparkMaxConfig();
-
 
         // Left motor settings
         leftConfig

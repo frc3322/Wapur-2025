@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 public class CrateIntake extends SubsystemBase {
 
     private final CrateIntakeIO crateIntakeIO;
-    private final static CrateIntake instance;
+    private static CrateIntake instance;
     private final CrateIntakeIOInputsAutoLogged inputs = new CrateIntakeIOInputsAutoLogged();
 
     public static CrateIntake getInstance() {
@@ -27,7 +27,7 @@ public class CrateIntake extends SubsystemBase {
     }
     
     public void updateInputs() {
-        crateIntakeIO.updateInputs(inputs);
+        CrateIntakeIO.updateInputs(inputs);
         Logger.processInputs("CrateIntake", inputs);
       }
 

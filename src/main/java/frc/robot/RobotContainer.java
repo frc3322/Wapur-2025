@@ -42,7 +42,7 @@ public class RobotContainer {
   private final Drive drive;
 
   // Controller
-  private final CommandXboxController controller = new CommandXboxController(0);
+  private final CommandXboxController primaryController = new CommandXboxController(0);
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -118,25 +118,25 @@ public class RobotContainer {
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
-            () -> -controller.getLeftY(),
-            () -> -controller.getLeftX(),
-            () -> -controller.getRightX()));
+            () -> -primaryController.getLeftY(),
+            () -> -primaryController.getLeftX(),
+            () -> -primaryController.getRightX()));
 
     // Lock to 0° when A button is held
-    controller
+    primaryController
         .a()
         .whileTrue(
             DriveCommands.joystickDriveAtAngle(
                 drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
+                () -> -primaryController.getLeftY(),
+                () -> -primaryController.getLeftX(),
                 () -> new Rotation2d()));
 
     // Switch to X pattern when X button is pressed
-    controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    primaryController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
     // Reset gyro to 0° when B button is pressed
-    controller
+    primaryController
         .b()
         .onTrue(
             Commands.runOnce(
@@ -145,8 +145,12 @@ public class RobotContainer {
                             new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
                     drive)
                 .ignoringDisable(true));
+    
+    primaryController
+        .leftBumper()
+        .onTrue
   }
-
+    
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *

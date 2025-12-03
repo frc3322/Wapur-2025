@@ -11,6 +11,12 @@ public interface CrateIntakeIO
         public double rightMotorSpeed = 0.0;
     }
 
-    public default void updateInputs(CrateIntakeIOInputs inputs) {}
-    public default void setMotorspeed(double speed) {}
+    public default void updateInputs(CrateIntakeIOInputs inputs)
+    {
+        // nothing (until it gets used)
+    }
+    public default void setMotorspeed(double speed)
+    {
+        // nothing. Default keyword lets the code compile wiothout error even if no arguments are in the method
+    }
 }

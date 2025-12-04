@@ -23,7 +23,7 @@ public class Elevator extends SubsystemBase {
   // Sets Elevator
   public static Elevator initialize(ElevatorIO elevatorIO) { 
     if (instance == null) { // If there is no instance then
-      instance = new Elevator(new ElevatorIOReal()); // Sets the new instance
+      instance = new Elevator(elevatorIO); // Sets the new instance
     }
     return instance; // Returns our object instance
   }

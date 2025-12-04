@@ -12,9 +12,11 @@ public class CrateIntake extends SubsystemBase {
   private static CrateIntake instance;
   private final CrateIntakeIOInputsAutoLogged inputs = new CrateIntakeIOInputsAutoLogged();
 
-  public static CrateIntake getInstance() {
+  public CrateIntakeState crateIntakeState = CrateIntakeState.STOP;
+
+  public static CrateIntake initialize(CrateIntakeIO crateIntakeIO) {
     if (instance == null) {
-      instance = new CrateIntake(new CrateIntakeIOReal());
+      instance = new CrateIntake(crateIntakeIO);
     }
     return instance;
   }
@@ -24,7 +26,7 @@ public class CrateIntake extends SubsystemBase {
   }
 
   public void updateInputs() {
-    CrateIntakeIO.updateInputs(inputs);
+    crateIntakeIO.updateInputs(inputs);
     Logger.processInputs("CrateIntake", inputs);
   }
 
@@ -43,5 +45,11 @@ public class CrateIntake extends SubsystemBase {
 
   public Command goToStateCommand(CrateIntakeState State) {
     return new InstantCommand(() -> setState(State), this);
+  }
+
+  public Command setCrateIntakeStateCommand(CrateIntakeState state) {
+    return new InstantCommand(
+      ()-> crateIntakeState = state, this
+    );
   }
 }

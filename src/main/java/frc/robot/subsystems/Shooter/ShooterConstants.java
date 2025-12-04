@@ -11,12 +11,12 @@ public class ShooterConstants {
     FEEDING(1.0, 0.0),
     STOP(0.0, 0.0);
 
-    public final double ShootermotorSpeed;
-    public final double FeedermotorSpeed;
+    public final double shooterMotorSpeed;
+    public final double feederMotorSpeed;
 
-    ShooterState(double shootermotorSpeed, double FeedermotorSpeed) {
-      this.FeedermotorSpeed = FeedermotorSpeed;
-      this.ShootermotorSpeed = ShootermotorSpeed;
+    ShooterState(double shooterMotorSpeed, double feederMotorSpeed) {
+      this.feederMotorSpeed = feederMotorSpeed;
+      this.shooterMotorSpeed = shooterMotorSpeed;
     }
   }
 }

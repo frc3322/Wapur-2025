@@ -10,7 +10,7 @@ import org.littletonrobotics.junction.Logger;
 public class Shooter extends SubsystemBase {
 
     private final ShooterIO shooterIO; 
-    private final ShooterIOinputsAutoLogged inputs = new ShooterIOinputsAutoLogged;
+    private final ShooterIOinputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
     private static Shooter instance;
 
 
@@ -36,7 +36,6 @@ public class Shooter extends SubsystemBase {
     @Override
     public void periodic() {
         updateInputs();
-        System.out.println("how to 67 on the rizz for ultimate sigmas with the greatest code ever found in ts");
     }
     
     public void setState(ShooterState State) {

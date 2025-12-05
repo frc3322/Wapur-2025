@@ -14,7 +14,10 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import frc.robot.subsystems.elevator.ElevatorConstants.ControllerConstants;
 
-/** Real hardware implementation for elevator using SparkFlex motor with PID and feedforward control. */
+/**
+ * Real hardware implementation for elevator using SparkFlex motor with PID and
+ * feedforward control.
+ */
 public class ElevatorIOReal implements ElevatorIO {
     private final SparkFlex motor;
     private final RelativeEncoder encoder;

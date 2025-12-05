@@ -12,7 +12,10 @@ import frc.robot.subsystems.elevator.ElevatorConstants.ElevatorState;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
-/** Elevator subsystem controlling vertical positioning with PID and feedforward control. */
+/**
+ * Elevator subsystem controlling vertical positioning with PID and feedforward
+ * control.
+ */
 public class Elevator extends SubsystemBase {
 
   private final ElevatorIO elevatorIO;

@@ -1,6 +1,9 @@
 package frc.robot.subsystems.elevator;
 
-/** Constants for the elevator subsystem including motor config, PID gains, and setpoints. */
+/**
+ * Constants for the elevator subsystem including motor config, PID gains, and
+ * setpoints.
+ */
 public class ElevatorConstants {
     public static final int motorCanId = 6;
     public static final int motorCurrentLimit = 50;

@@ -70,7 +70,7 @@ public class Elevator extends SubsystemBase {
 
   /** Sets elevator to a predefined state without moving. */
   public void setState(ElevatorState state) {
-    elevatorIO.presetSetpoint(elevatorHeight);
+    elevatorIO.presetSetpoint(state.elevatorSetpoint);
     this.elevatorState = state;
   }
 

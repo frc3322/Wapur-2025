@@ -172,7 +172,10 @@ public class RobotContainer {
                                     crateIntake.setState(CrateIntakeState.INTAKE);
                                     elevator.setState(ElevatorState.INTAKE);
                                 },
-                                () -> crateIntake.setState(CrateIntakeState.STOP),
+                                () -> {
+                                    crateIntake.setState(CrateIntakeState.STOP);
+                                    elevator.setState(ElevatorState.LEVEL0);
+                                },
                                 crateIntake, elevator));
 
         controller

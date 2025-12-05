@@ -51,7 +51,7 @@ public class Dropper extends SubsystemBase{
     return new InstantCommand(() -> setState(State), this);
   }
 
-  public Command setCrateIntakeStateCommand(DropperState state) {
+  public Command setDropperStateCommand(DropperState state) {
     return new InstantCommand(() -> dropperState = state, this);
   }
 }

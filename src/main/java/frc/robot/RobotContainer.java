@@ -49,160 +49,160 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-        private static final double TRIGGER_THRESHOLD = 0.1;
+    private static final double TRIGGER_THRESHOLD = 0.1;
 
-        // Subsystems
-        private final Drive drive;
-        private final Elevator elevator;
-        private final CrateIntake crateIntake;
+    // Subsystems
+    private final Drive drive;
+    private final Elevator elevator;
+    private final CrateIntake crateIntake;
 
-        // Controller
-        private final CommandXboxController controller = new CommandXboxController(0);
+    // Controller
+    private final CommandXboxController controller = new CommandXboxController(0);
 
-        // Dashboard inputs
-        private final LoggedDashboardChooser<Command> autoChooser;
+    // Dashboard inputs
+    private final LoggedDashboardChooser<Command> autoChooser;
 
-        /**
-         * The container for the robot. Contains subsystems, OI devices, and commands.
-         */
-        public RobotContainer() {
-                switch (Constants.currentMode) {
-                        case REAL:
-                                // Real robot, instantiate hardware IO implementations
-                                drive = new Drive(
-                                                new GyroIOPigeon2(),
-                                                new ModuleIOSpark(0),
-                                                new ModuleIOSpark(1),
-                                                new ModuleIOSpark(2),
-                                                new ModuleIOSpark(3));
-                                elevator = new Elevator(new ElevatorIOReal());
-                                crateIntake = new CrateIntake(new CrateIntakeIOReal());
-                                break;
+    /**
+     * The container for the robot. Contains subsystems, OI devices, and commands.
+     */
+    public RobotContainer() {
+        switch (Constants.currentMode) {
+            case REAL:
+                // Real robot, instantiate hardware IO implementations
+                drive = new Drive(
+                        new GyroIOPigeon2(),
+                        new ModuleIOSpark(0),
+                        new ModuleIOSpark(1),
+                        new ModuleIOSpark(2),
+                        new ModuleIOSpark(3));
+                elevator = new Elevator(new ElevatorIOReal());
+                crateIntake = new CrateIntake(new CrateIntakeIOReal());
+                break;
 
-                        case SIM:
-                                // Sim robot, instantiate physics sim IO implementations
-                                drive = new Drive(
-                                                new GyroIO() {
-                                                },
-                                                new ModuleIOSim(),
-                                                new ModuleIOSim(),
-                                                new ModuleIOSim(),
-                                                new ModuleIOSim());
-                                elevator = new Elevator(new ElevatorIO() {
-                                });
-                                crateIntake = new CrateIntake(new CrateIntakeIO() {
-                                });
-                                break;
+            case SIM:
+                // Sim robot, instantiate physics sim IO implementations
+                drive = new Drive(
+                        new GyroIO() {
+                        },
+                        new ModuleIOSim(),
+                        new ModuleIOSim(),
+                        new ModuleIOSim(),
+                        new ModuleIOSim());
+                elevator = new Elevator(new ElevatorIO() {
+                });
+                crateIntake = new CrateIntake(new CrateIntakeIO() {
+                });
+                break;
 
-                        default:
-                                // Replayed robot, disable IO implementations
-                                drive = new Drive(
-                                                new GyroIO() {
-                                                },
-                                                new ModuleIO() {
-                                                },
-                                                new ModuleIO() {
-                                                },
-                                                new ModuleIO() {
-                                                },
-                                                new ModuleIO() {
-                                                });
-                                elevator = new Elevator(new ElevatorIO() {
-                                });
-                                crateIntake = new CrateIntake(new CrateIntakeIO() {
-                                });
-                                break;
-                }
-
-                // Set up auto routines
-                autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
-
-                // Set up SysId routines
-                autoChooser.addOption(
-                                "Drive Wheel Radius Characterization",
-                                DriveCommands.wheelRadiusCharacterization(drive));
-                autoChooser.addOption(
-                                "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
-                autoChooser.addOption(
-                                "Drive SysId (Quasistatic Forward)",
-                                drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-                autoChooser.addOption(
-                                "Drive SysId (Quasistatic Reverse)",
-                                drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-                autoChooser.addOption(
-                                "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-                autoChooser.addOption(
-                                "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-
-                // Configure the button bindings
-                configureButtonBindings();
+            default:
+                // Replayed robot, disable IO implementations
+                drive = new Drive(
+                        new GyroIO() {
+                        },
+                        new ModuleIO() {
+                        },
+                        new ModuleIO() {
+                        },
+                        new ModuleIO() {
+                        },
+                        new ModuleIO() {
+                        });
+                elevator = new Elevator(new ElevatorIO() {
+                });
+                crateIntake = new CrateIntake(new CrateIntakeIO() {
+                });
+                break;
         }
 
-        /**
-         * Use this method to define your button->command mappings. Buttons can be
-         * created by
-         * instantiating a {@link GenericHID} or one of its subclasses ({@link
-         * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing
-         * it to a {@link
-         * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
-         */
-        private void configureButtonBindings() {
-                // Default command, normal field-relative drive
-                drive.setDefaultCommand(
-                                DriveCommands.joystickDrive(
-                                                drive,
-                                                () -> -controller.getLeftY(),
-                                                () -> -controller.getLeftX(),
-                                                () -> -controller.getRightX()));
+        // Set up auto routines
+        autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
-                // Reset gyro to 0° when B button is pressed
-                controller
-                                .b()
-                                .onTrue(
-                                                Commands.runOnce(
-                                                                () -> drive.setPose(
-                                                                                new Pose2d(drive.getPose()
-                                                                                                .getTranslation(),
-                                                                                                new Rotation2d())),
-                                                                drive)
-                                                                .ignoringDisable(true));
+        // Set up SysId routines
+        autoChooser.addOption(
+                "Drive Wheel Radius Characterization",
+                DriveCommands.wheelRadiusCharacterization(drive));
+        autoChooser.addOption(
+                "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
+        autoChooser.addOption(
+                "Drive SysId (Quasistatic Forward)",
+                drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+        autoChooser.addOption(
+                "Drive SysId (Quasistatic Reverse)",
+                drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+        autoChooser.addOption(
+                "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+        autoChooser.addOption(
+                "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
-                controller
-                                .rightTrigger(TRIGGER_THRESHOLD)
-                                .whileTrue(
-                                                Commands.startEnd(
-                                                                () -> {
-                                                                        crateIntake.setState(CrateIntakeState.INTAKE);
-                                                                        elevator.setState(ElevatorState.INTAKE);
-                                                                },
-                                                                () -> {
-                                                                        crateIntake.setState(CrateIntakeState.STOP);
-                                                                        elevator.setState(ElevatorState.LEVEL0);
-                                                                },
-                                                                crateIntake, elevator));
+        // Configure the button bindings
+        configureButtonBindings();
+    }
 
-                controller
-                                .leftTrigger(TRIGGER_THRESHOLD)
-                                .whileTrue(
-                                                Commands.startEnd(
-                                                                () -> crateIntake.setState(CrateIntakeState.OUTTAKE),
-                                                                () -> crateIntake.setState(CrateIntakeState.STOP),
-                                                                crateIntake));
+    /**
+     * Use this method to define your button->command mappings. Buttons can be
+     * created by
+     * instantiating a {@link GenericHID} or one of its subclasses ({@link
+     * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing
+     * it to a {@link
+     * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
+     */
+    private void configureButtonBindings() {
+        // Default command, normal field-relative drive
+        drive.setDefaultCommand(
+                DriveCommands.joystickDrive(
+                        drive,
+                        () -> -controller.getLeftY(),
+                        () -> -controller.getLeftX(),
+                        () -> -controller.getRightX()));
 
-                // Elevator level controls
-                controller.a().onTrue(elevator.setStateCommand(ElevatorState.INTAKE));
-                controller.povUp().onTrue(elevator.setStateCommand(ElevatorState.LEVEL3));
-                controller.povDown().onTrue(elevator.setStateCommand(ElevatorState.LEVEL2));
-                controller.povLeft().onTrue(elevator.setStateCommand(ElevatorState.LEVEL1));
-                controller.povRight().onTrue(elevator.setStateCommand(ElevatorState.LEVEL0));
-        }
+        // Reset gyro to 0° when B button is pressed
+        controller
+                .b()
+                .onTrue(
+                        Commands.runOnce(
+                                () -> drive.setPose(
+                                        new Pose2d(drive.getPose()
+                                                .getTranslation(),
+                                                new Rotation2d())),
+                                drive)
+                                .ignoringDisable(true));
 
-        /**
-         * Use this to pass the autonomous command to the main {@link Robot} class.
-         *
-         * @return the command to run in autonomous
-         */
-        public Command getAutonomousCommand() {
-                return autoChooser.get();
-        }
+        controller
+                .rightTrigger(TRIGGER_THRESHOLD)
+                .whileTrue(
+                        Commands.startEnd(
+                                () -> {
+                                    crateIntake.setState(CrateIntakeState.INTAKE);
+                                    elevator.setState(ElevatorState.INTAKE);
+                                },
+                                () -> {
+                                    crateIntake.setState(CrateIntakeState.STOP);
+                                    elevator.setState(ElevatorState.LEVEL0);
+                                },
+                                crateIntake, elevator));
+
+        controller
+                .leftTrigger(TRIGGER_THRESHOLD)
+                .whileTrue(
+                        Commands.startEnd(
+                                () -> crateIntake.setState(CrateIntakeState.OUTTAKE),
+                                () -> crateIntake.setState(CrateIntakeState.STOP),
+                                crateIntake));
+
+        // Elevator level controls
+        controller.a().onTrue(elevator.setStateCommand(ElevatorState.INTAKE));
+        controller.povUp().onTrue(elevator.setStateCommand(ElevatorState.LEVEL3));
+        controller.povDown().onTrue(elevator.setStateCommand(ElevatorState.LEVEL2));
+        controller.povLeft().onTrue(elevator.setStateCommand(ElevatorState.LEVEL1));
+        controller.povRight().onTrue(elevator.setStateCommand(ElevatorState.LEVEL0));
+    }
+
+    /**
+     * Use this to pass the autonomous command to the main {@link Robot} class.
+     *
+     * @return the command to run in autonomous
+     */
+    public Command getAutonomousCommand() {
+        return autoChooser.get();
+    }
 }

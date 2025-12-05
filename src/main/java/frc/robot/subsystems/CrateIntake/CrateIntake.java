@@ -10,48 +10,51 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.crateIntake.CrateIntakeConstants.CrateIntakeState;
 import org.littletonrobotics.junction.Logger;
 
-/** Subsystem controlling the crate intake mechanism with intake/outtake functionality. */
+/**
+ * Subsystem controlling the crate intake mechanism with intake/outtake
+ * functionality.
+ */
 public class CrateIntake extends SubsystemBase {
 
-  private final CrateIntakeIO crateIntakeIO;
-  private final CrateIntakeIOInputsAutoLogged inputs = new CrateIntakeIOInputsAutoLogged();
-  private static CrateIntake instance;
+    private final CrateIntakeIO crateIntakeIO;
+    private final CrateIntakeIOInputsAutoLogged inputs = new CrateIntakeIOInputsAutoLogged();
+    private static CrateIntake instance;
 
-  /** Gets singleton instance of the crate intake subsystem. */
-  public static CrateIntake getInstance() {
-    if (instance == null) {
-      instance = new CrateIntake(new CrateIntakeIOReal());
+    /** Gets singleton instance of the crate intake subsystem. */
+    public static CrateIntake getInstance() {
+        if (instance == null) {
+            instance = new CrateIntake(new CrateIntakeIOReal());
+        }
+        return instance;
     }
-    return instance;
-  }
 
-  /** Creates a new CrateIntake. */
-  public CrateIntake(CrateIntakeIO crateIntakeIO) {
-    this.crateIntakeIO = crateIntakeIO;
-  }
+    /** Creates a new CrateIntake. */
+    public CrateIntake(CrateIntakeIO crateIntakeIO) {
+        this.crateIntakeIO = crateIntakeIO;
+    }
 
-  public void updateInputs() {
-    crateIntakeIO.updateInputs(inputs);
-    Logger.processInputs("CrateIntake", inputs);
-  }
+    public void updateInputs() {
+        crateIntakeIO.updateInputs(inputs);
+        Logger.processInputs("CrateIntake", inputs);
+    }
 
-  @Override
-  public void periodic() {
-    updateInputs();
-  }
+    @Override
+    public void periodic() {
+        updateInputs();
+    }
 
-  /** Sets the intake to a predefined state (INTAKE, STOP, or OUTTAKE). */
-  public void setState(CrateIntakeState state) {
-    setMotorSpeed(state.motorSpeed);
-  }
+    /** Sets the intake to a predefined state (INTAKE, STOP, or OUTTAKE). */
+    public void setState(CrateIntakeState state) {
+        setMotorSpeed(state.motorSpeed);
+    }
 
-  /** Sets raw motor speed (-1.0 to 1.0). */
-  public void setMotorSpeed(double speed) {
-    crateIntakeIO.setMotorSpeed(speed);
-  }
+    /** Sets raw motor speed (-1.0 to 1.0). */
+    public void setMotorSpeed(double speed) {
+        crateIntakeIO.setMotorSpeed(speed);
+    }
 
-  /** Creates a command to transition to the specified state. */
-  public Command goToStateCommand(CrateIntakeState state) {
-    return new InstantCommand(() -> setState(state), this);
-  }
+    /** Creates a command to transition to the specified state. */
+    public Command goToStateCommand(CrateIntakeState state) {
+        return new InstantCommand(() -> setState(state), this);
+    }
 }

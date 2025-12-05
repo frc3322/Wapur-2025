@@ -179,7 +179,8 @@ public class RobotContainer {
                                     crateIntake.setState(CrateIntakeState.STOP);
                                     elevator.setState(ElevatorState.LEVEL0);
                                 },
-                                crateIntake, elevator));
+                                crateIntake,
+                                elevator));
 
         controller
                 .leftTrigger(TRIGGER_THRESHOLD)

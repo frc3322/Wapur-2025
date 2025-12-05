@@ -9,14 +9,17 @@ import frc.robot.util.FlatpackDecoder;
 import java.util.Optional;
 import org.littletonrobotics.junction.Logger;
 
+/** Vision subsystem that processes target poses from NetworkTables using Flatpack decoding. */
 public class Vision extends SubsystemBase {
   private static final String HAS_TARGET_KEY = "EagleEye/HasTarget";
   private final NetworkTable visionTable;
 
+  /** Initializes vision subsystem with NetworkTables connection. */
   public Vision() {
     visionTable = NetworkTableInstance.getDefault().getTable(VisionConstants.kVisionTableName);
   }
 
+  /** Periodically processes target pose data and logs it with 90-degree rotation. */
   @Override
   public void periodic() {
     Optional<Pose2d> targetPose = getTargetPose();
@@ -62,6 +65,7 @@ public class Vision extends SubsystemBase {
     }
   }
 
+  /** Attempts to extract Pose2d from decoded payload using multiple parsing strategies. */
   private Optional<Pose2d> extractPose(Object decodedPayload) {
     Optional<Pose2d> pose = poseFromConcretePayload(decodedPayload);
     if (pose.isPresent()) {
@@ -74,6 +78,7 @@ public class Vision extends SubsystemBase {
     return poseFromFloatArray(decodedPayload);
   }
 
+  /** Determines the schema type of the decoded payload for logging purposes. */
   private String determineSchemaLabel(Object decodedPayload) {
     if (decodedPayload instanceof FlatpackDecoder.Vector3[]) {
       return "vector3_array";
@@ -106,6 +111,7 @@ public class Vision extends SubsystemBase {
     return decodedPayload.getClass().getSimpleName();
   }
 
+  /** Extracts Pose2d from generic descriptor and float values by matching component names. */
   private Optional<Pose2d> poseFromDescriptor(
       FlatpackDecoder.SchemaDescriptor descriptor, float[] values) {
     Double xComponent = null;
@@ -131,6 +137,7 @@ public class Vision extends SubsystemBase {
     return Optional.of(new Pose2d(xComponent, yComponent, new Rotation2d(heading)));
   }
 
+  /** Attempts to extract Pose2d from concrete FlatpackDecoder types (Pose2D, Pose3D, Vector2, Vector3). */
   private Optional<Pose2d> poseFromConcretePayload(Object payload) {
     if (payload instanceof FlatpackDecoder.Pose3D[] poses3d && poses3d.length > 0) {
       return Optional.of(poseFromPose3d(poses3d[0]));
@@ -159,22 +166,27 @@ public class Vision extends SubsystemBase {
     return Optional.empty();
   }
 
+  /** Converts Vector3 to Pose2d (x,y components only, no rotation). */
   private Pose2d poseFromVector(FlatpackDecoder.Vector3 vector) {
     return new Pose2d(vector.x, vector.y, new Rotation2d());
   }
 
+  /** Converts Vector2 to Pose2d (x,y components only, no rotation). */
   private Pose2d poseFromVector(FlatpackDecoder.Vector2 vector) {
     return new Pose2d(vector.x, vector.y, new Rotation2d());
   }
 
+  /** Converts Pose3D to Pose2d using x,y,yaw components. */
   private Pose2d poseFromPose3d(FlatpackDecoder.Pose3D pose) {
     return new Pose2d(pose.x, pose.y, new Rotation2d(pose.yaw));
   }
 
+  /** Converts Pose2D to Pose2d directly. */
   private Pose2d poseFromPose2d(FlatpackDecoder.Pose2D pose) {
     return new Pose2d(pose.x, pose.y, new Rotation2d(pose.rotation));
   }
 
+  /** Attempts to extract Pose2d from generic FlatpackDecoder objects using schema descriptors. */
   private Optional<Pose2d> poseFromGenericPayload(Object payload) {
     if (payload instanceof FlatpackDecoder.GenericObjectArray array && array.values.length > 0) {
       return poseFromDescriptor(array.descriptor, array.values[0]);
@@ -185,6 +197,7 @@ public class Vision extends SubsystemBase {
     return Optional.empty();
   }
 
+  /** Attempts to extract Pose2d from raw float array [x, y, rotation]. */
   private Optional<Pose2d> poseFromFloatArray(Object payload) {
     if (payload instanceof float[] values && values.length >= 2) {
       double heading = values.length >= 3 ? values[2] : 0.0;

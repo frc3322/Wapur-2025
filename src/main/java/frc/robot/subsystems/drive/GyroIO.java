@@ -16,6 +16,7 @@ package frc.robot.subsystems.drive;
 import edu.wpi.first.math.geometry.Rotation2d;
 import org.littletonrobotics.junction.AutoLog;
 
+/** Interface for gyroscope hardware abstraction layer. */
 public interface GyroIO {
   @AutoLog
   public static class GyroIOInputs {

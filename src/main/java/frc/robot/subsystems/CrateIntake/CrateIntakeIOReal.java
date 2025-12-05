@@ -7,10 +7,12 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+/** Real hardware implementation for the crate intake using REV SparkMax motors. */
 public class CrateIntakeIOReal implements CrateIntakeIO {
   private final SparkMax leftMotor;
   private final SparkMax rightMotor;
 
+  /** Initializes the crate intake motors with proper configuration. */
   public CrateIntakeIOReal() {
     leftMotor = new SparkMax(CrateIntakeConstants.leftMotorCanId, MotorType.kBrushless);
     rightMotor = new SparkMax(CrateIntakeConstants.rightMotorCanId, MotorType.kBrushless);
@@ -32,6 +34,7 @@ public class CrateIntakeIOReal implements CrateIntakeIO {
     inputs.rightMotorSpeed = rightMotor.getEncoder().getVelocity();
   }
 
+  /** Sets motor speeds - left motor runs in reverse for proper intake direction. */
   @Override
   public void setMotorSpeed(double speed) {
     rightMotor.set(speed);

@@ -21,7 +21,7 @@ public class CrateIntake extends SubsystemBase {
     return instance;
   }
 
-  public CrateIntake(CrateIntakeIO crateIntakeIO) {
+  public CrateIntake(CrateIntakeIO crateIntakeIO) { //constructor for the class
     this.crateIntakeIO = crateIntakeIO;
   }
 
@@ -48,8 +48,6 @@ public class CrateIntake extends SubsystemBase {
   }
 
   public Command setCrateIntakeStateCommand(CrateIntakeState state) {
-    return new InstantCommand(
-      ()-> crateIntakeState = state, this
-    );
+    return new InstantCommand(() -> crateIntakeState = state, this);
   }
 }

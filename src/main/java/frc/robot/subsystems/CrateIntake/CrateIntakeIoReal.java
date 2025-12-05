@@ -1,15 +1,11 @@
 package frc.robot.subsystems.CrateIntake;
 
-
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-
-
-
 
 public class CrateIntakeIOReal implements CrateIntakeIO {
   private final SparkMax leftMotor;
@@ -28,7 +24,6 @@ public class CrateIntakeIOReal implements CrateIntakeIO {
     leftMotor.configure(leftConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     rightMotor.configure(
         rightConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
   }
 
   @Override
@@ -36,10 +31,10 @@ public class CrateIntakeIOReal implements CrateIntakeIO {
     inputs.leftMotorSpeed = leftMotor.getEncoder().getVelocity();
     inputs.rightMotorSpeed = rightMotor.getEncoder().getVelocity();
   }
+
   @Override
   public void setMotorspeed(double speed) {
     rightMotor.set(speed);
     leftMotor.set(speed);
-
   }
 }

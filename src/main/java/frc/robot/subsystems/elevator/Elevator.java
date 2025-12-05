@@ -21,7 +21,7 @@ public class Elevator extends SubsystemBase {
   private double elevatorHeight = 0;
 
   // Sets Elevator
-  public static Elevator initialize(ElevatorIO elevatorIO) { 
+  public static Elevator initialize(ElevatorIO elevatorIO) {
     if (instance == null) { // If there is no instance then
       instance = new Elevator(elevatorIO); // Sets the new instance
     }
@@ -33,8 +33,8 @@ public class Elevator extends SubsystemBase {
     return instance;
   }
 
-  public Elevator(ElevatorIO elevatorIO) { /// The constructor for the class
-    this.elevatorIO = elevatorIO; 
+  public Elevator(ElevatorIO elevatorIO) { // / The constructor for the class
+    this.elevatorIO = elevatorIO;
   }
 
   public void updateInputs() {

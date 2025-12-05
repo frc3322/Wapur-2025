@@ -9,99 +9,98 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 public class Elevator extends SubsystemBase {
-  private final ElevatorIO elevatorIO;
+    private final ElevatorIO elevatorIO;
 
-  private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
+    private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
 
-  private static Elevator instance;
+    private static Elevator instance;
 
-  private ElevatorStates elevatorState = ElevatorStates.STOW;
+    private ElevatorStates elevatorState = ElevatorStates.STOW;
 
-  private boolean atGoal = false;
-  private double elevatorHeight = 0;
+    private boolean atGoal = false;
+    private double elevatorHeight = 0;
 
-  // Sets Elevator
-  public static Elevator initialize(ElevatorIO elevatorIO) {
-    if (instance == null) { // If there is no instance then
-      instance = new Elevator(elevatorIO); // Sets the new instance
+    // Sets Elevator
+    public static Elevator initialize(ElevatorIO elevatorIO) {
+        if (instance == null) { // If there is no instance then
+            instance = new Elevator(elevatorIO); // Sets the new instance
+        }
+        return instance; // Returns our object instance
     }
-    return instance; // Returns our object instance
-  }
 
-  // Get Instance
-  public static Elevator getInstance() {
-    return instance;
-  }
+    // Get Instance
+    public static Elevator getInstance() {
+        return instance;
+    }
 
-  public Elevator(ElevatorIO elevatorIO) { // / The constructor for the class
-    this.elevatorIO = elevatorIO;
-  }
+    public Elevator(ElevatorIO elevatorIO) { // / The constructor for the class
+        this.elevatorIO = elevatorIO;
+    }
 
-  public void updateInputs() {
-    elevatorIO.updateInputs(inputs);
-    atGoal = inputs.atGoal;
+    public void updateInputs() {
+        elevatorIO.updateInputs(inputs);
+        atGoal = inputs.atGoal;
 
-    Logger.processInputs("Elevator", inputs);
+        Logger.processInputs("Elevator", inputs);
 
-    elevatorHeight = inputs.position;
-  }
+        elevatorHeight = inputs.position;
+    }
 
-  @Override
-  public void periodic() {
-    updateInputs();
-  }
+    @Override
+    public void periodic() {
+        updateInputs();
+    }
 
-  // Some getters that return values
-  public boolean isHighEnough() {
-    return elevatorHeight > 1.5;
-  }
+    // Some getters that return values
+    public boolean isHighEnough() {
+        return elevatorHeight > 1.5;
+    }
 
-  public boolean isAtGoal() {
-    return atGoal;
-  }
+    public boolean isAtGoal() {
+        return atGoal;
+    }
 
-  public double getElevatorHeightInMeters() {
-    return elevatorHeight;
-  }
+    public double getElevatorHeightInMeters() {
+        return elevatorHeight;
+    }
 
-  public ElevatorStates getElevatorstate() {
-    return elevatorState;
-  }
+    public ElevatorStates getElevatorstate() {
+        return elevatorState;
+    }
 
-  // Setters
-  public void setElevatorState(ElevatorStates elevatorStates) {
-    elevatorIO.presetSetpoint(elevatorHeight);
-    this.elevatorState = elevatorStates;
-  }
+    // Setters
+    public void setElevatorState(ElevatorStates elevatorStates) {
+        elevatorIO.presetSetpoint(elevatorHeight);
+        this.elevatorState = elevatorStates;
+    }
 
-  public Command goToStateCommand(Supplier<ElevatorStates> elevatorStateSupplier) {
-    return new RunCommand(
-        () -> {
-          ElevatorStates elevatorSetpoint = elevatorStateSupplier.get();
-          elevatorIO.goToPosition(
-              elevatorSetpoint.elevatorSetpoint, elevatorSetpoint.elevatorSetpoint);
-        },
-        this);
-  }
+    public Command goToStateCommand(Supplier<ElevatorStates> elevatorStateSupplier) {
+        return new RunCommand(
+                () -> {
+                    ElevatorStates elevatorSetpoint = elevatorStateSupplier.get();
+                    elevatorIO.goToPosition(elevatorSetpoint.elevatorSetpoint);
+                },
+                this);
+    }
 
-  public Command setStateCommand(ElevatorStates elevatorState) {
-    return new InstantCommand(
-        () -> {
-          setElevatorState(elevatorState);
-          elevatorIO.goToPosition(elevatorState.elevatorSetpoint, elevatorState.elevatorVelocity);
-        },
-        this);
-  }
+    public Command setStateCommand(ElevatorStates elevatorState) {
+        return new InstantCommand(
+                () -> {
+                    setElevatorState(elevatorState);
+                    elevatorIO.goToPosition(elevatorState.elevatorSetpoint);
+                },
+                this);
+    }
 
-  public Command lowerElevatorCommand() {
-    return new RunCommand(() -> elevatorIO.setMotorSpeeds(-.1), this);
-  }
+    public Command lowerElevatorCommand() {
+        return new RunCommand(() -> elevatorIO.setMotorSpeeds(-.1), this);
+    }
 
-  public Command stopElevatorCommand() {
-    return new InstantCommand(() -> elevatorIO.setMotorSpeeds(0), this);
-  }
+    public Command stopElevatorCommand() {
+        return new InstantCommand(() -> elevatorIO.setMotorSpeeds(0), this);
+    }
 
-  public Command zeroElevatorCommand() {
-    return new InstantCommand(() -> elevatorIO.zeroEncoder(), this);
-  }
+    public Command zeroElevatorCommand() {
+        return new InstantCommand(() -> elevatorIO.zeroEncoder(), this);
+    }
 }

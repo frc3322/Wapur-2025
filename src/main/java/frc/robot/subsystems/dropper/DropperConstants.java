@@ -1,16 +1,17 @@
 package frc.robot.subsystems.dropper;
 
 public class DropperConstants {
-    public static final int droppercanID = 99;
+  public static final int droppercanID = 99;
+  public static final int motorLimit = 40;
 
-    public enum DropperState {
-        OUTTAKE(-1),
-        STOP(0.0);
+  public enum DropperState {
+    OUTTAKE(-1),
+    STOP(0.0);
 
-        public final double motorSpeed;
+    public final double motorSpeed;
 
-        DropperState(double motorSpeed) {
-            this.motorSpeed = motorSpeed;
-        }
+    DropperState(double motorSpeed) {
+      this.motorSpeed = motorSpeed;
     }
+  }
 }

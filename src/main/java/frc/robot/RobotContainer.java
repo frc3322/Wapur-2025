@@ -32,6 +32,9 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSpark;
+import frc.robot.subsystems.dropper.Dropper;
+import frc.robot.subsystems.dropper.DropperConstants.DropperState;
+import frc.robot.subsystems.dropper.DropperIOReal;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorConstants.ElevatorStates;
 import frc.robot.subsystems.elevator.ElevatorIOReal;
@@ -48,6 +51,7 @@ public class RobotContainer {
   private final Drive drive;
   private final Elevator elevator;
   private final CrateIntake crateIntake;
+  private final Dropper dropper;
 
   // Controller
   private final CommandXboxController primaryController = new CommandXboxController(0);
@@ -71,6 +75,7 @@ public class RobotContainer {
 
         elevator = Elevator.initialize(new ElevatorIOReal());
         crateIntake = CrateIntake.initialize(new CrateIntakeIOReal());
+        dropper = Dropper.initialize(new DropperIOReal());
         break;
 
       case SIM:
@@ -85,6 +90,7 @@ public class RobotContainer {
 
         elevator = Elevator.initialize(new ElevatorIOReal());
         crateIntake = CrateIntake.initialize(new CrateIntakeIOReal());
+        dropper = Dropper.initialize(new DropperIOReal());
         break;
 
       default:
@@ -99,6 +105,8 @@ public class RobotContainer {
 
         elevator = Elevator.initialize(new ElevatorIOReal());
         crateIntake = CrateIntake.initialize(new CrateIntakeIOReal());
+        dropper = Dropper.initialize(new DropperIOReal());
+
         break;
     }
 
@@ -177,6 +185,11 @@ public class RobotContainer {
         .rightTrigger()
         .whileTrue(crateIntake.setCrateIntakeStateCommand(CrateIntakeState.INTAKE))
         .onFalse(crateIntake.setCrateIntakeStateCommand(CrateIntakeState.STOP));
+
+    primaryController
+        .rightBumper()
+        .whileTrue(dropper.setDropperStateCommand(DropperState.OUTTAKE))
+        .onFalse(dropper.setDropperStateCommand(DropperState.STOP));
   }
 
   /**

@@ -75,7 +75,7 @@ public class ElevatorIOReal implements ElevatorIO {
     }
 
     private void updatePID() {
-        ffOut = elevatorFeedForward.calculate(elevatorPID.getGoal().position, elevatorPID.getGoal().velocity);
+        ffOut = elevatorFeedForward.calculate(0, elevatorPID.getSetpoint().velocity);
         pidOut = elevatorPID.calculate(LeftEncoder.getPosition());
 
         double combinedOutput = ffOut + pidOut;

@@ -1,8 +1,8 @@
 package frc.robot.subsystems.CrateIntake;
 
 public class CrateIntakeConstants {
-  public static final int leftIntakeCanId = 14;
-  public static final int rightIntakeCanId = 15;
+  public static final int leftIntakeCanId = 3;
+  public static final int rightIntakeCanId = 61;
   public static final int motorLimit = 40;
 
   public enum CrateIntakeState {

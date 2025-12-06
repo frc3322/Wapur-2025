@@ -40,22 +40,22 @@ public class DriveConstants {
     public static final Rotation2d backRightZeroRotation = new Rotation2d(0.0);
 
     // Device CAN IDs
-    public static final int pigeonCanId = 9;
+    public static final int pigeonCanId = 2;
 
-    public static final int frontLeftDriveCanId = 1;
-    public static final int backLeftDriveCanId = 3;
-    public static final int frontRightDriveCanId = 5;
-    public static final int backRightDriveCanId = 7;
+    public static final int frontLeftDriveCanId = 62;
+    public static final int backLeftDriveCanId = 9;
+    public static final int frontRightDriveCanId = 8;
+    public static final int backRightDriveCanId = 28;
 
-    public static final int frontLeftTurnCanId = 2;
-    public static final int backLeftTurnCanId = 4;
-    public static final int frontRightTurnCanId = 6;
-    public static final int backRightTurnCanId = 8;
+    public static final int frontLeftTurnCanId = 47;
+    public static final int backLeftTurnCanId = 11;
+    public static final int frontRightTurnCanId = 14;
+    public static final int backRightTurnCanId = 4;
 
-    public static final int frontLeftTurnEncoderCanId = 10;
-    public static final int backLeftTurnEncoderCanId = 11;
-    public static final int frontRightTurnEncoderCanId = 12;
-    public static final int backRightTurnEncoderCanId = 13;
+    public static final int frontLeftTurnEncoderCanId = 0;
+    public static final int backLeftTurnEncoderCanId = 1;
+    public static final int frontRightTurnEncoderCanId = 31;
+    public static final int backRightTurnEncoderCanId = 7;
 
     // Drive motor configuration
     public static final int driveMotorCurrentLimit = 60;
@@ -66,9 +66,9 @@ public class DriveConstants {
 
     // Drive encoder configuration
     public static final double driveEncoderPositionFactor = 2 * Math.PI / driveMotorReduction; // Rotor Rotations ->
-                                                                                               // Wheel Radians
+    // Wheel Radians
     public static final double driveEncoderVelocityFactor = (2 * Math.PI) / 60.0 / driveMotorReduction; // Rotor RPM ->
-                                                                                                        // Wheel Rad/Sec
+    // Wheel Rad/Sec
 
     // Drive PID configuration
     public static final double driveKp = 0.0020645;

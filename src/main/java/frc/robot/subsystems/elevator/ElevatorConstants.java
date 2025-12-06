@@ -31,8 +31,8 @@ public class ElevatorConstants {
     }
 
     public class ElevatorCANIds {
-        public static final int leftMotorCANId = 13;
-        public static final int rightMotorCANId = 12;
+        public static final int leftMotorCANId = 55;
+        public static final int rightMotorCANId = 35;
     }
 
     public static final double manualElevatorResetSpeed = -0.1;

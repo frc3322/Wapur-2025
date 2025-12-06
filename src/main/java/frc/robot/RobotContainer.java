@@ -22,7 +22,6 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.CrateIntake.CrateIntake;
 import frc.robot.subsystems.CrateIntake.CrateIntakeConstants.CrateIntakeState;
@@ -42,162 +41,153 @@ import frc.robot.subsystems.elevator.ElevatorIOReal;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
- * This class is where the bulk of the robot should be declared. Since
- * Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in
- * the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of
- * the robot (including
+ * This class is where the bulk of the robot should be declared. Since Command-based is a
+ * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
+ * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-    // Subsystems
-    private final Drive drive;
-    private final Elevator elevator;
-    private final CrateIntake crateIntake;
-    private final Dropper dropper;
+  // Subsystems
+  private final Drive drive;
+  private final Elevator elevator;
+  private final CrateIntake crateIntake;
+  private final Dropper dropper;
 
-    // Controller
-    private final CommandXboxController primaryController = new CommandXboxController(0);
+  // Controller
+  private final CommandXboxController primaryController = new CommandXboxController(0);
 
-    // Dashboard inputs
-    private final LoggedDashboardChooser<Command> autoChooser;
+  // Dashboard inputs
+  private final LoggedDashboardChooser<Command> autoChooser;
 
-    /**
-     * The container for the robot. Contains subsystems, OI devices, and commands.
-     */
-    public RobotContainer() {
-        switch (Constants.currentMode) {
-            case REAL:
-                // Real robot, instantiate hardware IO implementations
-                // Modules 0 and 2 use SparkFlex (NeoVortex), modules 1 and 3 use SparkMax (NEO)
-                drive = new Drive(
-                        new GyroIOPigeon2(),
-                        new ModuleIOSpark(0, false), // Front Left - SparkFlex
-                        new ModuleIOSpark(1, true), // Front Right - SparkMax (NEO)
-                        new ModuleIOSpark(2, false), // Back Left - SparkFlex
-                        new ModuleIOSpark(3, true)); // Back Right - SparkMax (NEO)
+  /** The container for the robot. Contains subsystems, OI devices, and commands. */
+  public RobotContainer() {
+    switch (Constants.currentMode) {
+      case REAL:
+        // Real robot, instantiate hardware IO implementations
+        // Modules 0 and 2 use SparkFlex (NeoVortex), modules 1 and 3 use SparkMax (NEO)
+        drive =
+            new Drive(
+                new GyroIOPigeon2(),
+                new ModuleIOSpark(0, false), // Front Left - SparkFlex
+                new ModuleIOSpark(1, true), // Front Right - SparkMax (NEO)
+                new ModuleIOSpark(2, false), // Back Left - SparkFlex
+                new ModuleIOSpark(3, true)); // Back Right - SparkMax (NEO)
 
-                elevator = Elevator.initialize(new ElevatorIOReal());
-                crateIntake = CrateIntake.initialize(new CrateIntakeIOReal());
-                dropper = Dropper.initialize(new DropperIOReal());
-                break;
+        elevator = Elevator.initialize(new ElevatorIOReal());
+        crateIntake = CrateIntake.initialize(new CrateIntakeIOReal());
+        dropper = Dropper.initialize(new DropperIOReal());
+        break;
 
-            case SIM:
-                // Sim robot, instantiate physics sim IO implementations
-                drive = new Drive(
-                        new GyroIO() {
-                        },
-                        new ModuleIOSim(),
-                        new ModuleIOSim(),
-                        new ModuleIOSim(),
-                        new ModuleIOSim());
+      case SIM:
+        // Sim robot, instantiate physics sim IO implementations
+        drive =
+            new Drive(
+                new GyroIO() {},
+                new ModuleIOSim(),
+                new ModuleIOSim(),
+                new ModuleIOSim(),
+                new ModuleIOSim());
 
-                elevator = Elevator.initialize(new ElevatorIOReal());
-                crateIntake = CrateIntake.initialize(new CrateIntakeIOReal());
-                dropper = Dropper.initialize(new DropperIOReal());
-                break;
+        elevator = Elevator.initialize(new ElevatorIOReal());
+        crateIntake = CrateIntake.initialize(new CrateIntakeIOReal());
+        dropper = Dropper.initialize(new DropperIOReal());
+        break;
 
-            default:
-                // Replayed robot, disable IO implementations
-                drive = new Drive(
-                        new GyroIO() {
-                        },
-                        new ModuleIO() {
-                        },
-                        new ModuleIO() {
-                        },
-                        new ModuleIO() {
-                        },
-                        new ModuleIO() {
-                        });
+      default:
+        // Replayed robot, disable IO implementations
+        drive =
+            new Drive(
+                new GyroIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {});
 
-                elevator = Elevator.initialize(new ElevatorIOReal());
-                crateIntake = CrateIntake.initialize(new CrateIntakeIOReal());
-                dropper = Dropper.initialize(new DropperIOReal());
+        elevator = Elevator.initialize(new ElevatorIOReal());
+        crateIntake = CrateIntake.initialize(new CrateIntakeIOReal());
+        dropper = Dropper.initialize(new DropperIOReal());
 
-                break;
-        }
-
-        // Set up auto routines
-        autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
-
-        // Simple forward auton
-        autoChooser.addOption(
-                "Drive Forward",
-                Commands.run(() -> drive.runVelocity(new ChassisSpeeds(1.0, 0.0, 0.0)), drive)
-                        .withTimeout(2.0));
-
-        // Configure the button bindings
-        configureButtonBindings();
+        break;
     }
 
-    /**
-     * Use this method to define your button->command mappings. Buttons can be
-     * created by
-     * instantiating a {@link GenericHID} or one of its subclasses ({@link
-     * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing
-     * it to a {@link
-     * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
-     */
-    private void configureButtonBindings() {
-        // Default command, normal field-relative drive
-        drive.setDefaultCommand(
-                DriveCommands.joystickDrive(
-                        drive,
-                        () -> -primaryController.getLeftY(),
-                        () -> -primaryController.getLeftX(),
-                        () -> -primaryController.getRightX()));
+    // Set up auto routines
+    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
-        // Lock to 0° when A button is held
-        primaryController
-                .a()
-                .whileTrue(
-                        DriveCommands.joystickDriveAtAngle(
-                                drive,
-                                () -> -primaryController.getLeftY(),
-                                () -> -primaryController.getLeftX(),
-                                () -> new Rotation2d()));
+    // Simple forward auton
+    autoChooser.addOption(
+        "Drive Forward",
+        Commands.run(() -> drive.runVelocity(new ChassisSpeeds(1.0, 0.0, 0.0)), drive)
+            .withTimeout(2.0));
 
-        // Switch to X pattern when X button is pressed
-        primaryController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    // Configure the button bindings
+    configureButtonBindings();
+  }
 
-        // Reset gyro to 0° when B button is pressed
-        primaryController
-                .b()
-                .onTrue(
-                        Commands.runOnce(
-                                () -> drive.setPose(
-                                        new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
-                                drive)
-                                .ignoringDisable(true));
+  /**
+   * Use this method to define your button->command mappings. Buttons can be created by
+   * instantiating a {@link GenericHID} or one of its subclasses ({@link
+   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
+   * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
+   */
+  private void configureButtonBindings() {
+    // Default command, normal field-relative drive
+    drive.setDefaultCommand(
+        DriveCommands.joystickDrive(
+            drive,
+            () -> -primaryController.getLeftY(),
+            () -> -primaryController.getLeftX(),
+            () -> -primaryController.getRightX()));
 
-        primaryController.a().onTrue(elevator.setStateCommand(ElevatorStates.L1));
-        primaryController.x().onTrue(elevator.setStateCommand(ElevatorStates.L2));
-        primaryController.b().onTrue(elevator.setStateCommand(ElevatorStates.L3));
-        primaryController.y().onTrue(elevator.setStateCommand(ElevatorStates.L4));
+    // Lock to 0° when A button is held
+    primaryController
+        .a()
+        .whileTrue(
+            DriveCommands.joystickDriveAtAngle(
+                drive,
+                () -> -primaryController.getLeftY(),
+                () -> -primaryController.getLeftX(),
+                () -> new Rotation2d()));
 
-        primaryController
-                .leftTrigger()
-                .whileTrue(crateIntake.setCrateIntakeStateCommand(CrateIntakeState.OUTTAKE))
-                .onFalse(crateIntake.setCrateIntakeStateCommand(CrateIntakeState.STOP));
-        primaryController
-                .rightTrigger()
-                .whileTrue(crateIntake.setCrateIntakeStateCommand(CrateIntakeState.INTAKE))
-                .onFalse(crateIntake.setCrateIntakeStateCommand(CrateIntakeState.STOP));
+    // Switch to X pattern when X button is pressed
+    primaryController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
-        primaryController
-                .rightBumper()
-                .whileTrue(dropper.setDropperStateCommand(DropperState.OUTTAKE))
-                .onFalse(dropper.setDropperStateCommand(DropperState.STOP));
-    }
+    // Reset gyro to 0° when B button is pressed
+    primaryController
+        .b()
+        .onTrue(
+            Commands.runOnce(
+                    () ->
+                        drive.setPose(
+                            new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
+                    drive)
+                .ignoringDisable(true));
 
-    /**
-     * Use this to pass the autonomous command to the main {@link Robot} class.
-     *
-     * @return the command to run in autonomous
-     */
-    public Command getAutonomousCommand() {
-        return autoChooser.get();
-    }
+    primaryController.a().onTrue(elevator.setStateCommand(ElevatorStates.L1));
+    primaryController.x().onTrue(elevator.setStateCommand(ElevatorStates.L2));
+    primaryController.b().onTrue(elevator.setStateCommand(ElevatorStates.L3));
+    primaryController.y().onTrue(elevator.setStateCommand(ElevatorStates.L4));
+
+    primaryController
+        .leftTrigger()
+        .whileTrue(crateIntake.setCrateIntakeStateCommand(CrateIntakeState.OUTTAKE))
+        .onFalse(crateIntake.setCrateIntakeStateCommand(CrateIntakeState.STOP));
+    primaryController
+        .rightTrigger()
+        .whileTrue(crateIntake.setCrateIntakeStateCommand(CrateIntakeState.INTAKE))
+        .onFalse(crateIntake.setCrateIntakeStateCommand(CrateIntakeState.STOP));
+
+    primaryController
+        .rightBumper()
+        .whileTrue(dropper.setDropperStateCommand(DropperState.OUTTAKE))
+        .onFalse(dropper.setDropperStateCommand(DropperState.STOP));
+  }
+
+  /**
+   * Use this to pass the autonomous command to the main {@link Robot} class.
+   *
+   * @return the command to run in autonomous
+   */
+  public Command getAutonomousCommand() {
+    return autoChooser.get();
+  }
 }

@@ -31,8 +31,8 @@ public class ElevatorConstants {
   }
 
   public class ElevatorCANIds {
-    public static final int leftMotorCANId = 5;
-    public static final int rightMotorCANId = 6;
+    public static final int leftMotorCANId = 13;
+    public static final int rightMotorCANId = 12;
   }
 
   public static enum ElevatorStates {

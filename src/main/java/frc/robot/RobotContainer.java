@@ -151,6 +151,9 @@ public class RobotContainer {
                                 drive)
                                 .ignoringDisable(true));
 
+        primaryController.povDown().whileTrue(elevator.manualElevatorResetCommand())
+                .onFalse(elevator.zeroElevatorCommand());
+
         primaryController.a().onTrue(elevator.setStateCommand(ElevatorStates.L1));
         primaryController.x().onTrue(elevator.setStateCommand(ElevatorStates.L2));
         primaryController.b().onTrue(elevator.setStateCommand(ElevatorStates.L3));
